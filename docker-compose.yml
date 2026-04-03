@@ -1,0 +1,78 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: water_demo_db
+    environment:
+      POSTGRES_DB: waterdemo
+      POSTGRES_USER: waterdemo
+      POSTGRES_PASSWORD: waterdemo_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U waterdemo -d waterdemo"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: ./backend
+    container_name: water_demo_api
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./simulator/mock_data:/app/mock_data
+      - ./simulator/media:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: .
+      dockerfile: worker/Dockerfile
+    container_name: water_demo_worker
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+      - ./simulator/mock_data:/app/mock_data
+      - ./simulator/media:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+      api:
+        condition: service_started
+
+  dashboard:
+    build: ./dashboard
+    container_name: water_demo_dashboard
+    env_file:
+      - .env
+    ports:
+      - "8501:8501"
+    depends_on:
+      - api
+
+  simulator:
+    build: ./simulator
+    container_name: water_demo_simulator
+    env_file:
+      - .env
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./simulator/mock_data:/app/mock_data
+      - ./simulator/media:/app/media
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:

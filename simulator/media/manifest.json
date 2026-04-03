@@ -1,0 +1,32 @@
+{
+  "normal_river_01.mp4": {
+    "scenario": "normal",
+    "title": "Video of a Clean Flowing River",
+    "source": "Pexels",
+    "license": "Pexels License"
+  },
+  "normal_river_02.mp4": {
+    "scenario": "normal",
+    "title": "Clean river footage",
+    "source": "Pexels",
+    "license": "Pexels License"
+  },
+  "polluted_pipe_01.mp4": {
+    "scenario": "real_pollution",
+    "title": "Sewer Pipes Releasing Water in the River",
+    "source": "Pexels",
+    "license": "Pexels License"
+  },
+  "polluted_water_01.jpg": {
+    "scenario": "real_pollution",
+    "title": "Sewage Waste Exiting into River",
+    "source": "Pexels",
+    "license": "Pexels License"
+  },
+  "polluted_water_02.jpg": {
+    "scenario": "real_pollution",
+    "title": "Polluted water",
+    "source": "Wikimedia Commons",
+    "license": "Theo file gốc"
+  }
+}
