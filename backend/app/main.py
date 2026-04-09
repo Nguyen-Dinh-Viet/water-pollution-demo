@@ -11,12 +11,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from fastapi.staticfiles import StaticFiles
 
+from app.api.forecast import router as forecast_router
 from app.core.config import settings
 from app.core.db import get_conn
 from app.schemas.webhook import SensorWebhookPayload
-
-from app.api.forecast import router as forecast_router
-
 from app.services.persistence_service import (
     enqueue_raw_event,
     fetch_station,
@@ -25,6 +23,7 @@ from app.services.persistence_service import (
 )
 
 app = FastAPI(title="Water Pollution Demo API", version="0.3.0")
+app.include_router(forecast_router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

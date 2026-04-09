@@ -199,10 +199,10 @@ def save_vision(payload: dict, timestamp_utc: str, vision_result: Dict[str, Any]
                     motion_score = EXCLUDED.motion_score,
                     vision_state = EXCLUDED.vision_state,
                     bbox_json = EXCLUDED.bbox_json,
-                    media_file = EXCLUDED.media_file,
-                    media_meta = EXCLUDED.media_meta,
                     raw_frame_path = EXCLUDED.raw_frame_path,
-                    annotated_frame_path = EXCLUDED.annotated_frame_path
+                    annotated_frame_path = EXCLUDED.annotated_frame_path,
+                    media_file = EXCLUDED.media_file,
+                    media_meta = EXCLUDED.media_meta
                 """,
                 (
                     payload["event_id"],
@@ -324,34 +324,52 @@ def get_station_health_summary(station_code: str) -> Dict[str, Any]:
         "last_sensor_at": sensor_row.get("last_sensor_at"),
     }
 
-def save_forecast_result(conn, station_code, sensor_code, model_name, horizon_steps, timestamps, y_obs, y_fore, metrics):
+def save_forecast_result(
+    conn,
+    station_code,
+    sensor_code,
+    model_name,
+    horizon_steps,
+    timestamps,
+    y_obs,
+    y_fore,
+    metrics,
+):
     cur = conn.cursor()
 
-    cur.execute("""
+    cur.execute(
+        """
         INSERT INTO forecast_runs (station_code, sensor_code, model_name, horizon_steps)
         VALUES (%s, %s, %s, %s)
         RETURNING id
-    """, (station_code, sensor_code, model_name, horizon_steps))
-
+        """,
+        (station_code, sensor_code, model_name, horizon_steps),
+    )
     row = cur.fetchone()
     run_id = row["id"]
 
     for ts, obs, pred in zip(timestamps, y_obs, y_fore):
-        cur.execute("""
+        cur.execute(
+            """
             INSERT INTO forecast_predictions (run_id, timestamp_utc, y_obs, y_fore)
             VALUES (%s, %s, %s, %s)
-        """, (run_id, ts, obs, pred))
+            """,
+            (run_id, ts, obs, pred),
+        )
 
-    cur.execute("""
+    cur.execute(
+        """
         INSERT INTO forecast_metrics (run_id, rmse, mae, nrmse, n_points)
         VALUES (%s, %s, %s, %s, %s)
-    """, (
-        run_id,
-        metrics.get("rmse"),
-        metrics.get("mae"),
-        metrics.get("nrmse"),
-        metrics.get("n_points")
-    ))
+        """,
+        (
+            run_id,
+            metrics.get("rmse"),
+            metrics.get("mae"),
+            metrics.get("nrmse"),
+            metrics.get("n_points"),
+        ),
+    )
 
     cur.close()
     return run_id

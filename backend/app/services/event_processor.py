@@ -33,6 +33,7 @@ def process_event_payload(payload_dict: Dict[str, Any]) -> Dict[str, Any]:
 
     vision_state = "UNKNOWN"
     vision_result = None
+    
     camera_obj = payload_dict.get("camera") or {}
     camera_url = camera_obj.get("camera_url") if isinstance(camera_obj, dict) else None
     snapshot_url = camera_obj.get("snapshot_url") if isinstance(camera_obj, dict) else None

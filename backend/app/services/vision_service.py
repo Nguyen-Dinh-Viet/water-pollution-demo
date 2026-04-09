@@ -38,7 +38,6 @@ def load_frame_from_media(media_path: str):
 
         if not ok:
             return None
-
         return frame
 
     return None
@@ -190,7 +189,13 @@ def analyze_camera(
         raise RuntimeError(f"Không đọc được media thật: {media_path}")
         resolved_source = media_path
     else:
-        frame, resolved_source = _read_frame(camera_url, snapshot_url)
+        if media_path:
+            frame = load_frame_from_media(media_path)
+            if frame is None:
+                raise RuntimeError(f"Không đọc được media thật: {media_path}")
+            resolved_source = media_path
+        else:
+            frame, resolved_source = _read_frame(camera_url, snapshot_url)
     roi_frame = frame[y : y + h, x : x + w]
     if roi_frame.size == 0:
         raise RuntimeError("ROI không hợp lệ")
